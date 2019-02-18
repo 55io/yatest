@@ -16,12 +16,12 @@ services:
       - ./code:/code
     networks:
       - code-network
-#  composer:
-#    restart: 'no'
-#    image: composer/composer:php7
-#    command: install
-#    volumes:
-#      - .:/code
+  composer:
+    restart: 'no'
+    image: composer/composer:php7
+    command: install
+    volumes:
+      - .:/code
 networks:
   code-network:
     driver: bridge

@@ -6,7 +6,7 @@
  * Time: 16:23
  */
 
-namespace src\model;
+//namespace src\model;
 
 
 class GeneratedInterface
@@ -43,7 +43,8 @@ class GeneratedInterface
      */
     public function render(): string
     {
-        return $this->renderHead() . $this->renderConstants() . $this->renderProps() . $this->renderMethods();
+        $output = [$this->renderHead(), $this->renderConstants(), $this->renderProps(), $this->renderMethods()];
+        return implode(PHP_EOL, $output) . '}';
     }
 
     /**
@@ -52,8 +53,7 @@ class GeneratedInterface
     private function renderHead(): string
     {
         $extendsSection = implode(', ', $this->extends);
-        $head = "interface $this->name" . PHP_EOL . $extendsSection . PHP_EOL . '{';
-        return $head;
+        return "interface $this->name" . PHP_EOL . $extendsSection . PHP_EOL . '{';
     }
 
     /**
@@ -63,7 +63,7 @@ class GeneratedInterface
     {
         $renderedConstants = [];
         foreach ($this->constants as $key => $constant) {
-            $interfaceConstants[] = "const $key = $constant;";
+            $renderedConstants[] = "const $key = $constant;";
         }
         return implode(PHP_EOL, $renderedConstants);
     }
@@ -75,8 +75,8 @@ class GeneratedInterface
     private function renderProps(): string
     {
         return array_reduce($this->properties,
-            function (\ReflectionProperty $entity, $acc) {
-                return $acc . GeneratedInterface::renderPrefixes($entity) . " {$entity->getName()};" . PHP_EOL;
+            function ($acc, \ReflectionProperty $entity) {
+                return $acc . GeneratedInterface::renderPrefixes($entity) . '$' . "{$entity->getName()};" . PHP_EOL;
             }, '');
     }
 
@@ -86,11 +86,11 @@ class GeneratedInterface
     private function renderMethods(): string
     {
         return array_reduce($this->methods,
-            function (\ReflectionMethod $entity, $acc) {
+            function ($acc, \ReflectionMethod $entity) {
                 $newAcc = $acc . GeneratedInterface::renderPrefixes($entity) . " function {$entity->getName()}(";
                 $newAcc .= GeneratedInterface::renderMethodParameters($entity) . ')';
-                $newAcc .= $entity->hasReturnType() ? ": {$entity->getReturnType()}" : '';
-                return $newAcc;
+                $newAcc .= $entity->hasReturnType() ? ": {$entity->getReturnType()};" : ';';
+                return $newAcc . PHP_EOL;
             }, '');
     }
 
@@ -98,14 +98,12 @@ class GeneratedInterface
      * @param \ReflectionMethod|\ReflectionProperty|\ReflectionClassConstant|null $entity
      * @return string
      */
-    static function renderPrefixes(?\ReflectionProperty $entity): string
+    static function renderPrefixes($entity): string
     {
         $prefixes = [];
         $prefixes[] = $entity->isProtected() ? 'protected' : 'public';
         $prefixes[] = $entity->isStatic() ? 'static' : '';
         $prefixes[] = $entity instanceof \ReflectionClassConstant ? 'const' : '';
-        $prefixes[] = $entity instanceof \ReflectionMethod ? 'function' : '';
-        $prefixes[] = $entity->getName();
         return implode(' ', $prefixes);
     }
 
@@ -117,7 +115,7 @@ class GeneratedInterface
     {
         $params = array_map(
             function (\ReflectionParameter $parameter) {
-                $param = "{$parameter->getType()} {$parameter->getName()}";
+                $param = $parameter->getType() . '$' . $parameter->getName();
                 try {
                     $param .= " = {$parameter->getDefaultValue()}";
                 } catch (\Throwable $e) {

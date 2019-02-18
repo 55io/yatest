@@ -6,7 +6,7 @@
  * Time: 15:33
  */
 
-namespace test;
+//namespace test;
 
 
 class SimpleClass

@@ -11,7 +11,7 @@
 //use src\model\GeneratedInterface;
 //TODO Use composer
 include 'FileManagerService.php';
-include "/src/model/GeneratedInterface.php";
+include dirname(__FILE__) . '/../model/GeneratedInterface.php';
 
 class InterfaceGeneratorService
 {

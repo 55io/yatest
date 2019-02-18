@@ -6,7 +6,7 @@
  * Time: 15:37
  */
 
-namespace src\service;
+//namespace src\service;
 
 class FileManagerService
 {
